@@ -8,10 +8,21 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { useState } from "react";
 
+interface Property {
+  id: number;
+  title: string;
+  location: string;
+  type: string;
+  price: number;
+  image: string;
+  isLaunch: boolean;
+}
+
 export default function ImoveisPage() {
   const [selectedType, setSelectedType] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("");
   const [selectedPrice, setSelectedPrice] = useState("");
+  const [selectedOfferType, setSelectedOfferType] = useState("");
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -30,6 +41,22 @@ export default function ImoveisPage() {
       opacity: 1
     }
   };
+
+  const filteredProperties = properties.filter(property => {
+    const matchesType = selectedType === "" || property.type === selectedType;
+    const matchesOfferType = selectedOfferType === "" || 
+      (selectedOfferType === "launch" ? property.isLaunch : !property.isLaunch);
+
+    let matchesPrice = true;
+    if (selectedPrice !== "") {
+      const [minStr, maxStr] = selectedPrice.split("-");
+      const min = parseFloat(minStr);
+      const max = maxStr ? parseFloat(maxStr) : Infinity;
+      matchesPrice = property.price >= min && property.price <= max;
+    }
+
+    return matchesType && matchesPrice && matchesOfferType;
+  });
 
   return (
     <motion.div 
@@ -93,6 +120,18 @@ export default function ImoveisPage() {
                 <option value="1000000+">Acima de R$ 1.000.000</option>
               </select>
             </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Tipo de Oferta</label>
+              <select 
+                className="w-full border rounded-md p-2 bg-white hover:border-primary transition-colors"
+                value={selectedOfferType}
+                onChange={(e) => setSelectedOfferType(e.target.value)}
+              >
+                <option value="">Todos os tipos de oferta</option>
+                <option value="launch">Lançamentos</option>
+                <option value="regular">Regulares</option>
+              </select>
+            </div>
             <div className="flex items-end">
               <Button className="w-full h-10">
                 <Search className="w-4 h-4 mr-2" />
@@ -109,7 +148,7 @@ export default function ImoveisPage() {
           animate="visible"
           className="grid grid-cols-1 md:grid-cols-3 gap-8"
         >
-          {properties.map((property) => (
+          {filteredProperties.map((property) => (
             <motion.div
               key={property.id}
               variants={itemVariants}
@@ -123,6 +162,13 @@ export default function ImoveisPage() {
                     fill
                     className="object-cover transition-transform duration-300 group-hover:scale-110"
                   />
+                  {property.isLaunch && (
+                    <div className="absolute top-4 left-4">
+                      <span className="bg-primary text-white px-3 py-1 rounded-full text-sm font-medium">
+                        Lançamento
+                      </span>
+                    </div>
+                  )}
                   <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity duration-300" />
                 </div>
                 <div className="p-6">
@@ -139,7 +185,7 @@ export default function ImoveisPage() {
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-2xl font-bold text-primary">
-                      {property.price}
+                      {property.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                     </span>
                     <Button asChild>
                       <Link href={`/imoveis/${property.id}`}>Ver Detalhes</Link>
@@ -177,53 +223,59 @@ export default function ImoveisPage() {
   );
 }
 
-const properties = [
+const properties: Property[] = [
   {
     id: 1,
     title: "Apartamento de Luxo",
     location: "Jardins, São Paulo",
     type: "Apartamento",
-    price: "R$ 1.200.000",
+    price: 1200000,
     image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80",
+    isLaunch: true
   },
   {
     id: 2,
     title: "Casa com Piscina",
     location: "Alphaville, Barueri",
     type: "Casa",
-    price: "R$ 2.500.000",
+    price: 2500000,
     image: "https://images.unsplash.com/photo-1613490493576-7fde63acd811?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80",
+    isLaunch: false
   },
   {
     id: 3,
     title: "Cobertura Duplex",
     location: "Moema, São Paulo",
     type: "Apartamento",
-    price: "R$ 3.800.000",
+    price: 3800000,
     image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80",
+    isLaunch: true
   },
   {
     id: 4,
     title: "Casa em Condomínio",
     location: "Granja Viana, Cotia",
     type: "Casa",
-    price: "R$ 1.800.000",
+    price: 1800000,
     image: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80",
+    isLaunch: false
   },
   {
     id: 5,
     title: "Apartamento Garden",
     location: "Vila Nova Conceição, São Paulo",
     type: "Apartamento",
-    price: "R$ 2.900.000",
+    price: 2900000,
     image: "https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80",
+    isLaunch: true
   },
   {
     id: 6,
     title: "Sala Comercial",
     location: "Itaim Bibi, São Paulo",
     type: "Comercial",
-    price: "R$ 950.000",
+    price: 950000,
     image: "https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80",
+    isLaunch: false
   },
 ];
