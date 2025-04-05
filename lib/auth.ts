@@ -14,10 +14,16 @@ export async function signIn(email: string, password: string) {
   return data
 }
 
-export async function signUp(email: string, password: string) {
+export async function signUp(email: string, password: string, full_name: string) {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
+    options: {
+      data: {
+        full_name,
+        role: 'client',
+      },
+    },
   })
 
   if (error) {

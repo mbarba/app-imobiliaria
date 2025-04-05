@@ -7,7 +7,7 @@ interface AuthState {
   isAuthenticated: boolean;
   user: User | null;
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string) => Promise<void>;
+  register: (email: string, password: string, full_name: string) => Promise<void>;
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   updatePassword: (password: string) => Promise<void>;
@@ -24,8 +24,8 @@ export const useAuthStore = create<AuthState>()(
           set({ isAuthenticated: true, user: session.user });
         }
       },
-      register: async (email, password) => {
-        const { session } = await auth.signUp(email, password);
+      register: async (email, password, full_name) => {
+        const { session } = await auth.signUp(email, password, full_name);
         if (session?.user) {
           set({ isAuthenticated: true, user: session.user });
         }
