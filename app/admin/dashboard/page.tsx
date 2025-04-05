@@ -34,6 +34,9 @@ interface Imovel {
 export default function AdminDashboard() {
   const { isAuthenticated, user, logout } = useAuthStore();
   const router = useRouter();
+  const [imoveis, setImoveis] = useState<Imovel[]>([]);
+  const [novoImovel, setNovoImovel] = useState<Partial<Imovel>>({});
+  const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -41,35 +44,29 @@ export default function AdminDashboard() {
     }
   }, [isAuthenticated, router]);
 
-  if (!isAuthenticated) {
-    return null;
-  }
-
-  const [imoveis, setImoveis] = useState<Imovel[]>([]);
-  const [novoImovel, setNovoImovel] = useState<Partial<Imovel>>({});
-  const [showForm, setShowForm] = useState(false);
-
   // Simulando dados - em produção, isso viria da API
   useEffect(() => {
-    setImoveis([
-      {
-        id: "1",
-        titulo: "Apartamento Moderno",
-        descricao: "Lindo apartamento com 3 quartos",
-        preco: 500000,
-        tipo: "Apartamento",
-        status: "Disponível",
-        imagens: [],
-        dataLancamento: new Date(),
-        local: "Rua, Bairro, Cidade",
-        banheiros: 2,
-        quartos: 3,
-        suites: 1,
-        area: 120,
-        isLancamento: false,
-      }
-    ]);
-  }, []);
+    if (isAuthenticated) {
+      setImoveis([
+        {
+          id: "1",
+          titulo: "Apartamento Moderno",
+          descricao: "Lindo apartamento com 3 quartos",
+          preco: 500000,
+          tipo: "Apartamento",
+          status: "Disponível",
+          imagens: [],
+          dataLancamento: new Date(),
+          local: "Rua, Bairro, Cidade",
+          banheiros: 2,
+          quartos: 3,
+          suites: 1,
+          area: 120,
+          isLancamento: false,
+        }
+      ]);
+    }
+  }, [isAuthenticated]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -98,6 +95,10 @@ export default function AdminDashboard() {
     logout();
     router.push("/");
   };
+
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <div className="container mx-auto py-8">

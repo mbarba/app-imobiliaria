@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "db:migrate": "node scripts/db-migrate.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -38,6 +39,8 @@
     "@radix-ui/react-toggle": "^1.1.0",
     "@radix-ui/react-toggle-group": "^1.1.0",
     "@radix-ui/react-tooltip": "^1.1.2",
+    "@supabase/auth-helpers-nextjs": "^0.10.0",
+    "@tanstack/react-query": "^5.71.10",
     "@types/node": "20.6.2",
     "@types/react": "18.2.22",
     "@types/react-dom": "18.2.7",
@@ -70,5 +73,9 @@
     "vaul": "^0.9.9",
     "zod": "^3.24.2",
     "zustand": "^4.5.2"
+  },
+  "devDependencies": {
+    "@supabase/supabase-js": "^2.49.4",
+    "supabase": "^2.20.5"
   }
 }
