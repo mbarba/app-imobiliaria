@@ -4,22 +4,24 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { useAuthStore } from "@/lib/store";
 import { useRouter } from "next/navigation";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-const loginSchema = z.object({
+const authSchema = z.object({
   email: z.string().email("Email inválido"),
   password: z
     .string()
@@ -28,13 +30,7 @@ const loginSchema = z.object({
     .regex(/[0-9]/, "Senha deve conter pelo menos um número"),
 });
 
-type LoginForm = z.infer<typeof loginSchema>;
-
-const DEMO_USER = {
-  email: "admin@imobprime.com",
-  password: "Admin123!",
-  name: "Admin Demo",
-};
+type AuthForm = z.infer<typeof authSchema>;
 
 export function AuthModal({
   open,
@@ -44,47 +40,41 @@ export function AuthModal({
   onOpenChange: (open: boolean) => void;
 }) {
   const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
+  const [mode, setMode] = useState<"login" | "register" | "reset">("login");
   const router = useRouter();
-  const login = useAuthStore((state) => state.login);
+  const { login, register, resetPassword } = useAuthStore();
 
   const {
-    register,
+    register: registerForm,
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm<LoginForm>({
-    resolver: zodResolver(loginSchema),
+  } = useForm<AuthForm>({
+    resolver: zodResolver(authSchema),
   });
 
-  const onSubmit = async (data: LoginForm) => {
+  const onSubmit = async (data: AuthForm) => {
     setIsLoading(true);
     try {
-      // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      if (data.email === DEMO_USER.email && data.password === DEMO_USER.password) {
-        login({ name: DEMO_USER.name, email: DEMO_USER.email });
-        toast({
-          title: "Login realizado com sucesso!",
-          description: "Bem-vindo ao painel administrativo.",
-        });
-        onOpenChange(false);
-        reset();
+      if (mode === "login") {
+        await login(data.email, data.password);
+        toast.success("Login realizado com sucesso!");
         router.push("/admin/dashboard");
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Erro no login",
-          description: "Credenciais inválidas. Tente novamente.",
-        });
+      } else if (mode === "register") {
+        await register(data.email, data.password);
+        toast.success("Cadastro realizado com sucesso!");
+      } else if (mode === "reset") {
+        await resetPassword(data.email);
+        toast.success("Email de recuperação enviado!");
+        setMode("login");
       }
+      onOpenChange(false);
+      reset();
     } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Erro no login",
-        description: "Ocorreu um erro ao fazer login. Tente novamente.",
-      });
+      console.error(error);
+      toast.error(
+        error instanceof Error ? error.message : "Ocorreu um erro. Tente novamente."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -94,54 +84,86 @@ export function AuthModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Login Administrativo</DialogTitle>
+          <DialogTitle>
+            {mode === "login"
+              ? "Login"
+              : mode === "register"
+              ? "Cadastro"
+              : "Recuperar Senha"}
+          </DialogTitle>
           <DialogDescription>
-            Acesse o painel administrativo da ImobPrime
+            {mode === "login"
+              ? "Acesse sua conta"
+              : mode === "register"
+              ? "Crie sua conta"
+              : "Recupere sua senha"}
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="seu@email.com"
-              {...register("email")}
-              className={errors.email ? "border-red-500" : ""}
-            />
-            {errors.email && (
-              <p className="text-sm text-red-500">{errors.email.message}</p>
-            )}
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="password">Senha</Label>
-            <Input
-              id="password"
-              type="password"
-              {...register("password")}
-              className={errors.password ? "border-red-500" : ""}
-            />
-            {errors.password && (
-              <p className="text-sm text-red-500">{errors.password.message}</p>
-            )}
-          </div>
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? (
-              <motion.div
-                className="h-5 w-5 border-2 border-white border-t-transparent rounded-full"
-                animate={{ rotate: 360 }}
-                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+
+        <Tabs value={mode} onValueChange={(value: any) => setMode(value)} className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="login">Login</TabsTrigger>
+            <TabsTrigger value="register">Cadastro</TabsTrigger>
+          </TabsList>
+
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="seu@email.com"
+                {...registerForm("email")}
+                className={errors.email ? "border-red-500" : ""}
               />
-            ) : (
-              "Entrar"
+              {errors.email && (
+                <p className="text-sm text-red-500">{errors.email.message}</p>
+              )}
+            </div>
+            
+            {mode !== "reset" && (
+              <div className="space-y-2">
+                <Label htmlFor="password">Senha</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  {...registerForm("password")}
+                  className={errors.password ? "border-red-500" : ""}
+                />
+                {errors.password && (
+                  <p className="text-sm text-red-500">{errors.password.message}</p>
+                )}
+              </div>
             )}
-          </Button>
-        </form>
-        <div className="mt-4 text-sm text-center text-muted-foreground">
-          <p>Usuário demo para teste:</p>
-          <p>Email: admin@imobprime.com</p>
-          <p>Senha: Admin123!</p>
-        </div>
+
+            {mode === "login" && (
+              <Button
+                type="button"
+                variant="link"
+                className="px-0"
+                onClick={() => setMode("reset")}
+              >
+                Esqueceu sua senha?
+              </Button>
+            )}
+
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? (
+                <motion.div
+                  className="h-5 w-5 border-2 border-white border-t-transparent rounded-full"
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                />
+              ) : mode === "login" ? (
+                "Entrar"
+              ) : mode === "register" ? (
+                "Cadastrar"
+              ) : (
+                "Recuperar"
+              )}
+            </Button>
+          </form>
+        </Tabs>
       </DialogContent>
     </Dialog>
   );
