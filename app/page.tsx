@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Building2, MapPin, Search, Phone } from "lucide-react";
+import { Building2, MapPin, Search, Phone, ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -140,6 +140,14 @@ export default function Home() {
                   </Card>
                 </motion.div>
               ))}
+            </div>
+            <div className="flex justify-center mt-8">
+              <Button asChild size="lg">
+                <Link href="/imoveis" className="gap-2">
+                  Ver todos os imóveis
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </Button>
             </div>
           </motion.div>
         </div>

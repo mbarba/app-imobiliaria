@@ -1,8 +1,9 @@
 {
-  "/lancamentos/page": "app/lancamentos/page.js",
   "/admin/dashboard/page": "app/admin/dashboard/page.js",
   "/page": "app/page.js",
   "/sobre/page": "app/sobre/page.js",
   "/imoveis/[id]/page": "app/imoveis/[id]/page.js",
-  "/contato/page": "app/contato/page.js"
+  "/contato/page": "app/contato/page.js",
+  "/lancamentos/page": "app/lancamentos/page.js",
+  "/imoveis/page": "app/imoveis/page.js"
 }
