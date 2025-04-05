@@ -174,35 +174,6 @@ export default function Home() {
           </motion.div>
         </div>
       </section>
-
-      {/* Call to Action */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center"
-          >
-            <h2 className="text-3xl font-bold mb-8">Pronto para escolher seu imóvel?</h2>
-            <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Button size="lg" asChild>
-                <Link href="/imoveis">
-                  <Building2 className="w-5 h-5 mr-2" />
-                  Ver Todos os Imóveis
-                </Link>
-              </Button>
-              <Button size="lg" variant="outline" asChild>
-                <Link href="/contato">
-                  <Phone className="w-5 h-5 mr-2" />
-                  Falar com um Corretor
-                </Link>
-              </Button>
-            </div>
-          </motion.div>
-        </div>
-      </section>
     </div>
   );
 }
