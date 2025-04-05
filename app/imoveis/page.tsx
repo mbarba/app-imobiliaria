@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Building2, MapPin, Search } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -113,17 +114,24 @@ export default function ImoveisPage() {
             <motion.div
               key={property.id}
               variants={itemVariants}
-              whileHover={{ y: -5, transition: { duration: 0.2 } }}
+              className="h-full"
             >
-              <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
-                <div className="relative h-48 group">
+              <Card className="h-full group hover:shadow-lg transition-shadow duration-300">
+                <div className="relative h-64">
                   <Image
                     src={property.image}
                     alt={property.title}
                     fill
-                    className="object-cover transition-transform duration-300 group-hover:scale-110"
+                    className="object-cover rounded-t-lg"
                   />
                   <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity duration-300" />
+                  {property.isLaunch && (
+                    <div className="absolute top-4 right-4">
+                      <Badge variant="destructive">
+                        Lançamento
+                      </Badge>
+                    </div>
+                  )}
                 </div>
                 <div className="p-6">
                   <h3 className="text-xl font-bold mb-2 hover:text-primary transition-colors">
@@ -133,9 +141,20 @@ export default function ImoveisPage() {
                     <MapPin className="w-4 h-4 mr-1" />
                     {property.location}
                   </div>
-                  <div className="flex items-center text-gray-600 mb-4">
+                  <div className="flex items-center text-gray-600 mb-2">
                     <Building2 className="w-4 h-4 mr-1" />
                     {property.type}
+                  </div>
+                  <div className="flex items-center text-gray-600 mb-4">
+                    <div className="flex gap-4">
+                      <span>{property.area} m²</span>
+                      {property.bedrooms > 0 && (
+                        <span>{property.bedrooms} quartos</span>
+                      )}
+                      {property.suites > 0 && (
+                        <span>{property.suites} suítes</span>
+                      )}
+                    </div>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-2xl font-bold text-primary">
@@ -180,50 +199,92 @@ export default function ImoveisPage() {
 const properties = [
   {
     id: 1,
-    title: "Apartamento de Luxo",
-    location: "Jardins, São Paulo",
+    title: "Apartamento de Luxo com Vista para o Mar",
+    location: "Av. Beira Mar, 1000 - Praia do Canto, Vitória/ES",
     type: "Apartamento",
-    price: "R$ 1.200.000",
-    image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80",
+    price: "R$ 1.250.000",
+    image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&h=500&fit=crop",
+    bedrooms: 4,
+    suites: 2,
+    bathrooms: 3,
+    area: 180,
+    isLaunch: true,
+    status: "Disponível",
+    description: "Luxuoso apartamento com acabamento premium, varanda gourmet e vista privilegiada para o mar. Localizado em área nobre, próximo a restaurantes, shopping e praia."
   },
   {
     id: 2,
-    title: "Casa com Piscina",
-    location: "Alphaville, Barueri",
+    title: "Casa com Piscina em Condomínio Fechado",
+    location: "Alphaville, Barueri/SP",
     type: "Casa",
     price: "R$ 2.500.000",
-    image: "https://images.unsplash.com/photo-1613490493576-7fde63acd811?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80",
+    image: "https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&h=500&fit=crop",
+    bedrooms: 5,
+    suites: 3,
+    bathrooms: 4,
+    area: 350,
+    isLaunch: false,
+    status: "Disponível",
+    description: "Ampla casa em condomínio fechado com piscina, área gourmet e jardim. Segurança 24h e infraestrutura completa de lazer."
   },
   {
     id: 3,
-    title: "Cobertura Duplex",
-    location: "Moema, São Paulo",
-    type: "Apartamento",
+    title: "Cobertura Duplex com Terraço",
+    location: "Moema, São Paulo/SP",
+    type: "Cobertura",
     price: "R$ 3.800.000",
-    image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80",
+    image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&h=500&fit=crop",
+    bedrooms: 4,
+    suites: 4,
+    bathrooms: 5,
+    area: 400,
+    isLaunch: true,
+    status: "Disponível",
+    description: "Cobertura duplex com acabamento de alto padrão, terraço com piscina e vista panorâmica da cidade. Localização privilegiada."
   },
   {
     id: 4,
-    title: "Casa em Condomínio",
-    location: "Granja Viana, Cotia",
+    title: "Casa Contemporânea em Condomínio",
+    location: "Granja Viana, Cotia/SP",
     type: "Casa",
     price: "R$ 1.800.000",
-    image: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80",
+    image: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&h=500&fit=crop",
+    bedrooms: 3,
+    suites: 1,
+    bathrooms: 4,
+    area: 250,
+    isLaunch: false,
+    status: "Disponível",
+    description: "Casa moderna com projeto arquitetônico diferenciado, integração total com a área externa e muito verde."
   },
   {
     id: 5,
-    title: "Apartamento Garden",
-    location: "Vila Nova Conceição, São Paulo",
+    title: "Apartamento Garden com Área Privativa",
+    location: "Vila Nova Conceição, São Paulo/SP",
     type: "Apartamento",
     price: "R$ 2.900.000",
-    image: "https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80",
+    image: "https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?w=800&h=500&fit=crop",
+    bedrooms: 3,
+    suites: 3,
+    bathrooms: 4,
+    area: 280,
+    isLaunch: true,
+    status: "Disponível",
+    description: "Apartamento garden com 280m² de área privativa, jardim e área gourmet. Prédio com lazer completo em localização nobre."
   },
   {
     id: 6,
-    title: "Sala Comercial",
-    location: "Itaim Bibi, São Paulo",
+    title: "Sala Comercial Premium",
+    location: "Itaim Bibi, São Paulo/SP",
     type: "Comercial",
     price: "R$ 950.000",
-    image: "https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1740&q=80",
-  },
+    image: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&h=500&fit=crop",
+    bedrooms: 0,
+    suites: 0,
+    bathrooms: 2,
+    area: 85,
+    isLaunch: false,
+    status: "Disponível",
+    description: "Sala comercial com acabamento premium, pronta para uso. Localização estratégica com fácil acesso."
+  }
 ];
